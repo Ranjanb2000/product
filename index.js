@@ -59,7 +59,7 @@ app.post('/products/create',async function(req,res)
     }
 });
 // this function is used to find all the documents in the database
-app.get('/products/',async function(req,res){
+app.get('/products',async function(req,res){
     let products = await Product.find({})
         .sort('-createdAt');
 
@@ -91,8 +91,9 @@ app.delete('/products/:id',async function(req,res){
 app.put('/products/:id/update_quantity/',async function(req,res){
     
     try{
+        let prod=await Product.findById(req.params.id);
         let product=await Product.findByIdAndUpdate(req.params.id,{
-        quantity:req.query.number
+        quantity:parseInt(prod.quantity)+parseInt(req.query.number)
     });
     return res.json(200, {
         message: "updated successfully",
