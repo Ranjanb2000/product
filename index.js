@@ -4,14 +4,15 @@ const mongoose=require('mongoose');
 const app = express();
 const port = 8000;
 app.use(express.json());
-
+// it is used to connect the database
 mongoose.connect('mongodb://127.0.0.1:27017/authenticate');
 
 const db = mongoose.connection;
 
+// if it is fails to connect then this below one line code executes
 db.on('error', console.error.bind(console, "Error connecting to MongoDB"));
 
-
+// upon successfull connection to database this below line will executes
 db.once('open', function(){
     console.log('Connected to Database :: MongoDB');
 });
@@ -19,6 +20,7 @@ db.once('open', function(){
 
 
 app.use(express.urlencoded());
+//the below code tells about document schema of the product  
 const productSchema = new mongoose.Schema({ 
     name: {
         type: String,
@@ -38,6 +40,7 @@ const productSchema = new mongoose.Schema({
 });
 
 const Product = mongoose.model('Product', productSchema);
+// below code is used to add the data to the database
 app.post('/products/create',async function(req,res)
 {
     try
@@ -55,6 +58,7 @@ app.post('/products/create',async function(req,res)
         console.log(err);
     }
 });
+// this function is used to find all the documents in the database
 app.get('/products/',async function(req,res){
     let products = await Product.find({})
         .sort('-createdAt');
@@ -64,15 +68,10 @@ app.get('/products/',async function(req,res){
         products: products
     })
 });
-
+// this function is used to delerte all the documents in the database
 app.delete('/products/:id',async function(req,res){
     try{
         let product = await Product.findById(req.params.id);
-
-        // if (post.user == req.user.id){
-            
-
-           
             await Product.findByIdAndDelete(product._id);
 
 
@@ -80,11 +79,7 @@ app.delete('/products/:id',async function(req,res){
             return res.json(200, {
                 message: "product deleted successfully!"
             });
-        // }else{
-        //     req.flash('error', 'You cannot delete this post!');
-        //     return res.redirect('back');
-        // }
-
+        
     }catch(err){
         console.log('********', err);
         return res.json(500, {
@@ -92,7 +87,7 @@ app.delete('/products/:id',async function(req,res){
         });
     }
 });
-
+// this function is used to update the existing document using object_id in the database
 app.put('/products/:id/update_quantity/',async function(req,res){
     
     try{
@@ -111,14 +106,10 @@ app.put('/products/:id/update_quantity/',async function(req,res){
     }
 })
 
-
-
-
-
-
+// this function is used to connect to the server.
 app.listen(port, function(err){
     if(err){
-        console.log(`Error in running Server, ${err}`); // interpolation
+        console.log(`Error in running Server, ${err}`); 
     }
     console.log(`Server is running on port: ${port}`);
 })
